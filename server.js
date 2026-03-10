@@ -4,13 +4,14 @@ const morgan = require("morgan");
 const cors = require("cors");
 require("dotenv").config();
 const authRoutes = require("./routes/auth.Route.js");
+const userRoutes = require("./routes/user.Route.js");
 const connectDatabase = require("./config/db.js");
-const errorMiddleware = require("./middleware/errorMiddleware.js");
+const errorMiddleware = require("./middleware/ErrorMiddleware.js");
 //constants
 const PORT = process.env.PORT || 5000;
 const PROD = process.env.PROD || false;
 const CORSOPTIONS = {
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: process.env.LOCAL_FRONTEND_URI || "http://localhost:5173",
     credentials: true
 };
 
@@ -27,6 +28,7 @@ app.use(morgan('dev'));  //Logging Requests Endpoints
 
 //Routes
 app.use("/auth", authRoutes);
+app.use("/user", userRoutes);
 
 
 

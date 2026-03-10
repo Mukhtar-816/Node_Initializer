@@ -3,6 +3,7 @@ const redisDal = require("../DAL/redis.Dal.js");
 const CustomError = require("../utils/CustomError");
 const reusable = require("../utils/reusable.js");
 const sessionService = require("./session.Service.js");
+const emailService = require("./email.Service.js");
 
 class AuthService {
     constructor() { }
@@ -69,6 +70,12 @@ class AuthService {
         await redisDal.set(`temp:user:${email}`, tempUser);
         await redisDal.set(`otp:${email}`, otp);
 
+        await emailService.send(email, "Verify Your Email", "otp", {
+            name : username,
+            otp,
+            expiry : "10 mins"
+        });
+
         return {
             success: true,
             message: `Otp sent successfully to ${email}`
@@ -104,6 +111,12 @@ class AuthService {
             redisDal.del(`temp:user:${email}`),
             redisDal.del(`otp:${email}`)
         ]);
+
+        await emailService.send(email, "Verification Successfull, you can now login into your acount", "verificationSuccess", {
+            name : user?.username,
+            email,
+            loginUrl : `${process.env.LOCAL_FRONTEND_URI}/auth/login`
+        });
 
         return {
             success: true,
